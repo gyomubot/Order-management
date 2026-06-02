@@ -6,9 +6,44 @@
   <title>オーダー管理</title>
   <link rel="stylesheet" href="design.css">
 </head>
-  
+
 <body>
-  
+
   <h1>オーダー管理</h1>
+
+  <!-- ✅ 表を表示する場所 -->
+  <table id="table"></table>
+
+  <script>
+    fetch("https://script.google.com/macros/s/AKfycbza3OmnyOQ0zC8Tdwf9LfPBuktdJ-fJbu9aL7_fteLDJjOMUi6BukDas-ZdVtS-9k920w/exec?t=" + new Date().getTime())
+      .then(res => res.json())
+      .then(data => {
+        const table = document.getElementById("table");
+        table.innerHTML = "";
+
+        const headers = Object.keys(data[0]);
+
+        // ヘッダー行
+        const headerRow = document.createElement("tr");
+        headers.forEach(h => {
+          const th = document.createElement("th");
+          th.textContent = h;
+          headerRow.appendChild(th);
+        });
+        table.appendChild(headerRow);
+
+        // データ行
+        data.forEach(row => {
+          const tr = document.createElement("tr");
+          headers.forEach(h => {
+            const td = document.createElement("td");
+            td.textContent = row[h];
+            tr.appendChild(td);
+          });
+          table.appendChild(tr);
+        });
+      });
+  </script>
+
 </body>
 </html>
