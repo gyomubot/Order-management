@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>オーダー管理</title>
   <link rel="stylesheet" href="design.css">
 </head>
@@ -10,53 +10,56 @@
 <body>
 
   <h1>オーダー管理</h1>
-  <a href="https://docs.google.com/spreadsheets/d/1aCH9JhmT8ijX0Zv-7rSPGjLgyipYGnb0vXKESkvA_oA/edit?gid=0#gid=0">表示元シート</a>
-  <br>
+  <a href="https://docs.google.com/spreadsheets/d/1aCH9JhmT8ijX0Zv-7rSPGjLgyipYGnb0vXKESkvA_oA/edit" target="_blank">
+    表示元シート
+  </a>
 
-  <!-- ✅ 表を表示する場所 -->
-  <table id="table"></table>
+  <div id="list"></div>
 
-  
-<div id="list"></div>
+  <script>
+    fetch("GASのURL?t=" + new Date().getTime())
+      .then(res => res.json())
+      .then(data => {
+        const list = document.getElementById("list");
+        list.innerHTML = "";
 
-<script>
-fetch("https://script.google.com/macros/s/AKfycbza3OmnyOQ0zC8Tdwf9LfPBuktdJ-fJbu9aL7_fteLDJjOMUi6BukDas-ZdVtS-9k920w/exec?t=" + new Date().getTime())
-  .then(res => res.json())
-  .then(data => {
-    const list = document.getElementById("list");
-    list.innerHTML = "";
+        data.forEach(row => {
+          const card = document.createElement("div");
+          card.className = "card";
 
-    const headers = Object.keys(data[0]);
-
-    data.forEach(row => {
-      const card = document.createElement("div");
-      card.className = "card";
-
-      headers.forEach((h, index) => {
-        let value = row[h];
-
-        // 日付変換
-        if (index === 1 && value) {
-          const d = new Date(value);
-          if (!isNaN(d)) {
-            const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
-            value =
-              jst.getFullYear() + "/" +
-              String(jst.getMonth() + 1).padStart(2, "0") + "/" +
-              String(jst.getDate()).padStart(2, "0");
+          // 日付フォーマット
+          let date = row["開催日"];
+          if (date) {
+            const d = new Date(date);
+            if (!isNaN(d)) {
+              const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+              date =
+                jst.getFullYear() + "/" +
+                String(jst.getMonth() + 1).padStart(2, "0") + "/" +
+                String(jst.getDate()).padStart(2, "0");
+            }
           }
-        }
 
-        const item = document.createElement("div");
-        item.innerHTML = `<strong>${h}:</strong> ${value}`;
-        card.appendChild(item);
+          card.innerHTML = `
+            <div class="top">${date || ""}</div>
+            <div class="title">${row["公演名"] || ""}</div>
+
+            <div class="info">📍 ${row["開催場所"] || ""}</div>
+            <div class="info">🎫 ${row["枚数"] || 0} 枚</div>
+
+            <div class="divider"></div>
+
+            <div class="sub">申込者: ${row["申込者名"] || ""}</div>
+            <div class="sub">📧 ${row["メールアドレス"] || ""}</div>
+
+            ${row["備考"] ? `<div class="memo">📝 ${row["備考"]}</div>` : ""}
+          `;
+
+          list.appendChild(card);
+        });
       });
-
-      list.appendChild(card);
-    });
-  });
-</script>
-
+  </script>
 
 </body>
 </html>
+``
