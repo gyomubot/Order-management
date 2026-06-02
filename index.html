@@ -16,55 +16,46 @@
   <!-- ✅ 表を表示する場所 -->
   <table id="table"></table>
 
-  <script>
-  fetch("https://script.google.com/macros/s/AKfycbza3OmnyOQ0zC8Tdwf9LfPBuktdJ-fJbu9aL7_fteLDJjOMUi6BukDas-ZdVtS-9k920w/exec?t=" + new Date().getTime())
-    .then(res => res.json())
-    .then(data => {
-      const table = document.getElementById("table");
-      table.innerHTML = "";
+  
+<div id="list"></div>
 
-      const headers = Object.keys(data[0]);
+<script>
+fetch("https://script.google.com/macros/s/AKfycbza3OmnyOQ0zC8Tdwf9LfPBuktdJ-fJbu9aL7_fteLDJjOMUi6BukDas-ZdVtS-9k920w/exec?t=" + new Date().getTime())
+  .then(res => res.json())
+  .then(data => {
+    const list = document.getElementById("list");
+    list.innerHTML = "";
 
-      // ヘッダー行
-      const headerRow = document.createElement("tr");
-      headers.forEach(h => {
-        const th = document.createElement("th");
-        th.textContent = h;
-        headerRow.appendChild(th);
-      });
-      table.appendChild(headerRow);
+    const headers = Object.keys(data[0]);
 
-      // データ行
-      data.forEach(row => {
-        const tr = document.createElement("tr");
+    data.forEach(row => {
+      const card = document.createElement("div");
+      card.className = "card";
 
-        headers.forEach((h, index) => {
-          const td = document.createElement("td");
-          let value = row[h];
+      headers.forEach((h, index) => {
+        let value = row[h];
 
-          // ✅ 2列目だけ（index = 1）
-          if (index === 1 && value) {
-            const d = new Date(value);
-
-            if (!isNaN(d)) {
-              // ✅ 日本時間に変換（+9時間）
-              const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
-
-              value =
-                jst.getFullYear() + "/" +
-                String(jst.getMonth() + 1).padStart(2, "0") + "/" +
-                String(jst.getDate()).padStart(2, "0");
-            }
+        // 日付変換
+        if (index === 1 && value) {
+          const d = new Date(value);
+          if (!isNaN(d)) {
+            const jst = new Date(d.getTime() + 9 * 60 * 60 * 1000);
+            value =
+              jst.getFullYear() + "/" +
+              String(jst.getMonth() + 1).padStart(2, "0") + "/" +
+              String(jst.getDate()).padStart(2, "0");
           }
+        }
 
-          td.textContent = value;
-          tr.appendChild(td);
-        });
-
-        table.appendChild(tr);
+        const item = document.createElement("div");
+        item.innerHTML = `<strong>${h}:</strong> ${value}`;
+        card.appendChild(item);
       });
+
+      list.appendChild(card);
     });
-  </script>
+  });
+</script>
 
 
 </body>
